@@ -14,7 +14,7 @@ func (t *EndpointUtils) GetDiscoveryServiceUrls(config *EurekaClientConfig, zone
 	//}
 
 	//return t.GetServiceUrlsFromConfig(config, zone)
-	urls := []string{"http://192.168.1.6:8761/eureka"}
+	urls := []string{"http://127.0.0.1:8751/instance"}
 	return urls, nil
 }
 

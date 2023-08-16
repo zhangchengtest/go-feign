@@ -69,7 +69,7 @@ func (t *EurekaServerApi) RegisterInstance(appId string, port int) (string, erro
 	vo := DefaultInstanceVo()
 	vo.App = appId
 	vo.Status = STATUS_STARTING
-	vo.Port = positiveInt{Value: port, Enabled: "true"}
+	vo.Port = port
 
 	return t.RegisterInstanceWithVo(vo)
 }
@@ -77,7 +77,7 @@ func (t *EurekaServerApi) RegisterInstance(appId string, port int) (string, erro
 // Register new application instance
 func (t *EurekaServerApi) RegisterInstanceWithVo(vo *InstanceVo) (string, error) {
 	if vo.HomePageUrl == "" {
-		vo.HomePageUrl = fmt.Sprintf("http://%s:%d", vo.IppAddr, vo.Port.Value)
+		vo.HomePageUrl = fmt.Sprintf("http://%s:%d", vo.IppAddr, vo.Port)
 	}
 	if vo.StatusPageUrl == "" {
 		vo.StatusPageUrl = strings.Trim(vo.HomePageUrl, "/") + "/info"
@@ -88,11 +88,12 @@ func (t *EurekaServerApi) RegisterInstanceWithVo(vo *InstanceVo) (string, error)
 	}
 
 	if vo.InstanceId == "" {
-		vo.InstanceId = fmt.Sprintf("%s:%s:%d", vo.Hostname, vo.App, vo.Port.Value)
+		vo.InstanceId = fmt.Sprintf("%s:%s:%d", vo.Hostname, vo.App, vo.Port)
 	}
+	timestamp := time.Now().Unix()
 
-	body, _ := json.Marshal(map[string]interface{}{"instance": vo})
-	_, err := t.request(http.MethodPost, t.url("/apps/"+vo.App), body)
+	body, _ := json.Marshal(map[string]interface{}{"name": vo.App, "ip": vo.Hostname, "port": vo.Port, "beatTime": timestamp})
+	_, err := t.request(http.MethodPost, t.url("/register"), body)
 	if err != nil {
 		log.Errorf("Failed to register app=%s, err=%s", vo.App, err.Error())
 		return "", err
@@ -123,22 +124,53 @@ func (t *EurekaServerApi) SendHeartbeat(appId, instanceId string) error {
 	return nil
 }
 
+func converta(a SphereApplication) ApplicationVo {
+	// 这里是A类型到B类型的具体转换逻辑
+	b := ApplicationVo{
+		Name:      a.Name,
+		Instances: convertArray(a.Instances, convertb),
+	}
+	return b
+}
+
+func convertb(a SphereInstance) InstanceVo {
+	// 这里是A类型到B类型的具体转换逻辑
+	b := InstanceVo{
+		Hostname: a.Ip,
+		Port:     a.Port,
+	}
+	return b
+}
+
 // Query for all instances
 func (t *EurekaServerApi) QueryAllInstances() ([]ApplicationVo, error) {
-	res, err := t.request(http.MethodGet, t.url("/apps"))
+	res, err := t.request(http.MethodGet, t.url("/list"))
 	if err != nil {
 		log.Errorf("Failed to query all instances, err=%s", err.Error())
 		return nil, err
 	}
 
-	resApps := make(map[string]ApplicationsVo)
-	err = json.Unmarshal(res.Body(), &resApps)
+	var result []SphereApplication
+	err = json.Unmarshal(res.Body(), &result)
 	if err != nil {
 		log.Errorf("Failed to query all instances, json.Unmarshal err=%s", err.Error())
 		return nil, err
 	}
 
-	return resApps["applications"].Application, nil
+	resultB := convertArray(result, converta)
+
+	return resultB, nil
+}
+
+func convertArray[A, B any](aArray []A, convertOne func(A) B) []B {
+	bArray := make([]B, len(aArray))
+
+	for i, a := range aArray {
+		b := convertOne(a)
+		bArray[i] = b
+	}
+
+	return bArray
 }
 
 // Query for all appId instances
@@ -180,7 +212,14 @@ func (t *EurekaServerApi) QuerySpecificAppInstance(instanceId string) (*Instance
 
 // update instance status
 func (t *EurekaServerApi) UpdateInstanceStatus(appId, instanceId, status string) error {
-	_, err := t.request(http.MethodPut, t.url(fmt.Sprintf("/apps/%s/%s/status?value=%s", appId, instanceId, status)))
+	_, err := t.request(http.MethodPost,
+		t.url(fmt.Sprintf("/apps/%s/%s/status?value=%s", appId, instanceId, status)))
+
+	timestamp := time.Now().Unix()
+
+	body, _ := json.Marshal(map[string]interface{}{"name": vo.App, "ip": vo.Hostname, "port": vo.Port, "beatTime": timestamp})
+	_, err := t.request(http.MethodPost, t.url("/register"), body)
+
 	if err != nil {
 		log.Errorf("Failed to update instance status, err=%s", err.Error())
 		return err
