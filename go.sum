@@ -1,0 +1,17 @@
+github.com/HikoQiu/go-eureka-client/eureka v0.0.0-20200428035747-ac92e3f91f92 h1:oHPSeylcoF+j+RROlM1FcVlm9Et2xtv+x9CmkeI34H0=
+github.com/HikoQiu/go-eureka-client/eureka v0.0.0-20200428035747-ac92e3f91f92/go.mod h1:tDsCwVBarPYa8k55pmRmd9CuuNAiI2ZkXhbden2HzxA=
+github.com/HikoQiu/go-feign/feign v0.0.0-20181128030340-49e6851aff9f h1:sWdg4UZh+fRIZUR5DPD4cmm2YD91AMCH7Vsd6GjnlC8=
+github.com/HikoQiu/go-feign/feign v0.0.0-20181128030340-49e6851aff9f/go.mod h1:WTwUvpvyMWN/yEn7hXbavo+vYPgXqj9Lb9tV3flw7cQ=
+github.com/miekg/dns v1.0.15 h1:9+UupePBQCG6zf1q/bGmTO1vumoG13jsrbWOSX1W6Tw=
+github.com/miekg/dns v1.0.15/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
+golang.org/x/crypto v0.12.0 h1:tFM/ta59kqch6LlvYnPa0yx5a83cL2nHflFhYKvv9Yk=
+golang.org/x/crypto v0.12.0/go.mod h1:NF0Gs7EO5K4qLn+Ylc+fih8BSTeIjAP05siRnAh98yw=
+golang.org/x/net v0.0.0-20181011144130-49bb7cea24b1/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
+golang.org/x/net v0.10.0 h1:X2//UzNDwYmtCLn7To6G58Wr6f5ahEAQgKNzv9Y951M=
+golang.org/x/net v0.10.0/go.mod h1:0qNGK6F8kojg2nk9dLZ2mShWaEBan6FAoqfSigmmuDg=
+golang.org/x/sync v0.3.0 h1:ftCYgMx6zT/asHUrPw8BLLscYtGznsLAnjq5RH9P66E=
+golang.org/x/sync v0.3.0/go.mod h1:FU7BRWz2tNW+3quACPkgCx/L+uEAv1htQ0V83Z9Rj+Y=
+golang.org/x/sys v0.11.0 h1:eG7RXZHdqOJ1i+0lgLgCpSXAp6M3LYlAo6osgSi0xOM=
+golang.org/x/sys v0.11.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+gopkg.in/resty.v1 v1.10.2 h1:0kn7/nSP3fjAddBOjnYDq0rmyvVFvuk4iFtWQUWptjc=
+gopkg.in/resty.v1 v1.10.2/go.mod h1:nrgQYbPhkRfn2BfT32NNTLfq3K9NuHRB0MsAcA9weWY=
