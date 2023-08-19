@@ -15,14 +15,15 @@ func main() {
 
 	// 1.2 use discovery client
 	config := eureka.GetDefaultEurekaClientConfig()
-	config.UseDnsForFetchingServiceUrls = true
 	config.Region = "region-cn-hd-1"
 	config.AvailabilityZones = map[string]string{
 		"region-cn-hd-1": "zone-cn-hz-1",
 	}
-	config.EurekaServerDNSName = "dev.ms-registry.xf.io"
-	config.EurekaServerUrlContext = "eureka"
-	config.EurekaServerPort = "9001"
+
+	config.ServiceUrl = map[string]string{
+		"zone-cn-hz-1": "http://127.0.0.1:8751/instance",
+	}
+
 	eureka.DefaultClient.Config(config).
 		Register("APP_ID_CLIENT_FROM_DNS", 9000).
 		Run()
@@ -31,9 +32,9 @@ func main() {
 	log.Println("----> request by registy apps")
 	// assign a eureka client explicitly, or use the eureka.DefaultClient by default.
 	feign.DefaultFeign.UseDiscoveryClient(eureka.DefaultClient)
-	res, err := feign.DefaultFeign.App("CUNW-USERCENTER-SERVER").R().SetHeaders(map[string]string{
+	res, err := feign.DefaultFeign.App("puzzle").R().SetHeaders(map[string]string{
 		"Content-Type": "application/json",
-	}).Get("/area/province")
+	}).Get("/articles/page")
 	if err != nil {
 		log.Println("err=", err.Error())
 		return

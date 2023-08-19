@@ -129,24 +129,25 @@ func (t *Client) refreshServiceUrls() error {
 }
 
 func (t *Client) getServiceUrlsWithZones() error {
-	availZones := t.config.GetAvailabilityZones(t.config.Region)
-	endpointUtils := new(EndpointUtils)
+	//availZones := t.config.GetAvailabilityZones(t.config.Region)
+	//endpointUtils := new(EndpointUtils)
 
 	// loop to get zone's service urls
 	var err error
-	var urls []string
+
+	availZones := t.config.GetAvailabilityZones(t.config.GetRegion())
+	log.Debugf("The availability zone for the given region %s are %v ", t.config.GetRegion(), availZones)
+
+	urls := make([]string, 0)
 	for _, zone := range availZones {
-		urls, err = endpointUtils.GetDiscoveryServiceUrls(t.config, zone)
-		if err != nil {
-			log.Errorf("Failed to boot eureka client, zone=%s, err=%s", zone, err.Error())
+		if _, ok := t.config.ServiceUrl[zone]; !ok {
 			continue
 		}
 
-		t.mu.Lock()
-		t.mu.Unlock()
-		t.serviceUrls = urls
-		break
+		zoneUrls := strings.Split(t.config.ServiceUrl[zone], ",")
+		urls = append(urls, zoneUrls...)
 	}
+	t.serviceUrls = urls
 
 	return err
 }
@@ -307,17 +308,17 @@ func (t *Client) handleSignal() {
 			log.Infof("Receive exit signal, client instance going to de-register, instanceId=%s.", t.instance.InstanceId)
 
 			// de-register instance
-			api, err := t.Api()
-			if err != nil {
-				log.Errorf("Failed to get EurekaServerApi instance, de-register %s failed, err=%s", t.instance.InstanceId, err.Error())
-				return
-			}
+			//api, err := t.Api()
+			//if err != nil {
+			//	log.Errorf("Failed to get EurekaServerApi instance, de-register %s failed, err=%s", t.instance.InstanceId, err.Error())
+			//	return
+			//}
 
-			err = api.DeRegisterInstance(t.instance.App, t.instance.InstanceId)
-			if err != nil {
-				log.Errorf("Failed to de-register %s, err=%s", t.instance.InstanceId, err.Error())
-				return
-			}
+			//err = api.DeRegisterInstance(t.instance.App, t.instance.InstanceId)
+			//if err != nil {
+			//	log.Errorf("Failed to de-register %s, err=%s", t.instance.InstanceId, err.Error())
+			//	return
+			//}
 
 			log.Infof("de-register %s success.", t.instance.InstanceId)
 			os.Exit(0)

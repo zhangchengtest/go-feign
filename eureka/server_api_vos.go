@@ -14,7 +14,7 @@ const (
 type (
 	SphereInstance struct {
 		Name     string `json:"name"`
-		BeatTime string `json:"beatTime"`
+		BeatTime int64  `json:"beatTime"`
 		Ip       string `json:"ip"`
 		Port     int    `json:"port"`
 	}
@@ -63,7 +63,7 @@ type (
 
 	SphereApplication struct {
 		Name      string           `json:"name"`
-		Instances []SphereInstance `json:"instance"`
+		Instances []SphereInstance `json:"instances"`
 	}
 
 	ApplicationsVo struct {

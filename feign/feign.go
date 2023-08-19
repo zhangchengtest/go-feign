@@ -1,10 +1,10 @@
 package feign
 
 import (
+	"fmt"
 	"gopkg.in/resty.v1"
 	"net/url"
 	"samples/eureka"
-	"strings"
 	"sync"
 	"time"
 )
@@ -157,40 +157,10 @@ func (t *Feign) updateAppUrls() {
 	tmpAppUrls := make(map[string][]string)
 
 	for app, appVo := range registryApps {
-		var isAppAlreadyExist bool
-		var curAppUrls []string
-		var isUpdate bool
 
-		// if app is already exist in t.appUrls, check whether app's urls are updated.
-		// if app's urls are updated, t.appUrls
-		if curAppUrls, isAppAlreadyExist = t.GetAppUrls(app); isAppAlreadyExist {
-			if len(curAppUrls) != len(appVo.Instances) {
-				isUpdate = true
-			} else {
-				for _, insVo := range appVo.Instances {
-					isExist := false
-					for _, v := range curAppUrls {
-						insHomePageUrl := strings.TrimRight(insVo.HomePageUrl, "/")
-						if v == insHomePageUrl {
-							isExist = true
-							break
-						}
-					}
-
-					if !isExist {
-						isUpdate = true
-						break
-					}
-				}
-			}
-		}
-
-		// app are not exist in t.appUrls or app's urls has been update
-		if !isAppAlreadyExist || isUpdate {
-			tmpAppUrls[app] = make([]string, 0)
-			for _, insVo := range appVo.Instances {
-				tmpAppUrls[app] = append(tmpAppUrls[app], strings.TrimRight(insVo.HomePageUrl, "/"))
-			}
+		tmpAppUrls[app] = make([]string, 0)
+		for _, insVo := range appVo.Instances {
+			tmpAppUrls[app] = append(tmpAppUrls[app], fmt.Sprintf("http://%s:%d", insVo.IppAddr, insVo.Port))
 		}
 	}
 

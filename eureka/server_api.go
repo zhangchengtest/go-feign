@@ -115,7 +115,7 @@ func (t *EurekaServerApi) DeRegisterInstance(appId, instanceId string) error {
 
 // Send application instance heartbeat
 func (t *EurekaServerApi) SendHeartbeat(appId, instanceId string) error {
-	_, err := t.request(http.MethodPut, t.url(fmt.Sprintf("/apps/%s/%s", appId, instanceId)))
+	_, err := t.request(http.MethodPost, t.url(fmt.Sprintf("/heart/%s/%s/beat", appId, instanceId)))
 	if err != nil {
 		log.Errorf("Failed to send instance heartbeat, app-id=%s, instance-id=%s, err=%s", appId, instanceId, err.Error())
 		return err
@@ -136,8 +136,8 @@ func converta(a SphereApplication) ApplicationVo {
 func convertb(a SphereInstance) InstanceVo {
 	// 这里是A类型到B类型的具体转换逻辑
 	b := InstanceVo{
-		Hostname: a.Ip,
-		Port:     a.Port,
+		IppAddr: a.Ip,
+		Port:    a.Port,
 	}
 	return b
 }
@@ -212,14 +212,7 @@ func (t *EurekaServerApi) QuerySpecificAppInstance(instanceId string) (*Instance
 
 // update instance status
 func (t *EurekaServerApi) UpdateInstanceStatus(appId, instanceId, status string) error {
-	_, err := t.request(http.MethodPost,
-		t.url(fmt.Sprintf("/apps/%s/%s/status?value=%s", appId, instanceId, status)))
-
-	timestamp := time.Now().Unix()
-
-	body, _ := json.Marshal(map[string]interface{}{"name": vo.App, "ip": vo.Hostname, "port": vo.Port, "beatTime": timestamp})
-	_, err := t.request(http.MethodPost, t.url("/register"), body)
-
+	_, err := t.request(http.MethodPost, t.url(fmt.Sprintf("/status/%s/%s/update?value=%s", appId, instanceId, status)))
 	if err != nil {
 		log.Errorf("Failed to update instance status, err=%s", err.Error())
 		return err
